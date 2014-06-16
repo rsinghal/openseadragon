@@ -296,6 +296,74 @@ $.Drawer.prototype = /** @lends OpenSeadragon.Drawer.prototype */{
     },
 
     /**
+     * Used internally to load images when required.  May also be used to
+     * preload a set of images so the browser will have them available in
+     * the local cache to optimize user experience in certain cases. Because
+     * the number of parallel image loads is configurable, if too many images
+     * are currently being loaded, the request will be ignored.  Since by
+     * default drawer.imageLoaderLimit is 0, the native browser parallel
+     * image loading policy will be used.
+     * @method
+     * @param {String} src - The url of the image to load.
+     * @param {Function} callback - The function that will be called with the
+     *      Image object as the only parameter if it was loaded successfully.
+     *      If an error occured, or the request timed out or was aborted,
+     *      the parameter is null instead.
+     * @return {Boolean} loading - Whether the request was submitted or ignored
+     *      based on OpenSeadragon.DEFAULT_SETTINGS.imageLoaderLimit.
+     */
+    loadImage: function( src, callback ) {
+        var _this = this,
+            loading = false,
+            image,
+            jobid,
+            complete;
+
+        if ( !this.imageLoaderLimit ||
+              this.downloading < this.imageLoaderLimit ) {
+
+            this.downloading++;
+
+            image = new Image();
+            //image.crossOrigin = 'Anonymous';
+
+            complete = function( imagesrc, resultingImage ){
+                _this.downloading--;
+                if (typeof ( callback ) == "function") {
+                    try {
+                        callback( resultingImage );
+                    } catch ( e ) {
+                        $.console.error(
+                            "%s while executing %s callback: %s",
+                            e.name,
+                            src,
+                            e.message,
+                            e
+                        );
+                    }
+                }
+            };
+
+            image.onload = function(){
+                finishLoadingImage( image, complete, true, jobid );
+            };
+
+            image.onabort = image.onerror = function(){
+                finishLoadingImage( image, complete, false, jobid );
+            };
+
+            jobid = window.setTimeout( function(){
+                finishLoadingImage( image, complete, false, jobid );
+            }, this.timeout );
+
+            loading   = true;
+            image.src = src;
+        }
+
+        return loading;
+    },
+
+    /**
      * Returns whether rotation is supported or not.
      * @method
      * @return {Boolean} True if rotation is supported.
@@ -1018,8 +1086,10 @@ function drawTiles( drawer, lastDrawn ){
                     //TODO: IE seems to barf on this, not sure if its just the border
                     //      but we probably need to clear this up with a better
                     //      test of support for various css features
-                    if( SUBPIXEL_RENDERING ){
+                    if( drawer.viewport.collectionBorder ){
                         viewer.element.style.border = '1px solid rgba(255,255,255,0.38)';
+                    }
+                    if( drawer.viewport.collectionReflection ) {
                         viewer.element.style['-webkit-box-reflect'] =
                             'below 0px -webkit-gradient('+
                                 'linear,left '+

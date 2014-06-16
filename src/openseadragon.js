@@ -532,6 +532,10 @@
   *
   * @property {Number} [collectionTileSize=800]
   *
+  * @property {Boolean} [collectionReflection=false]
+  * 
+  * @property {Boolean} [collectionBorder=false]
+  *
   * @property {String|Boolean} [crossOriginPolicy=false]
   *      Valid values are 'Anonymous', 'use-credentials', and false. If false, canvas requests will
   *      not use CORS, and the canvas will be tainted.
@@ -979,6 +983,8 @@ window.OpenSeadragon = window.OpenSeadragon || function( options ){
             collectionLayout:       'horizontal', //vertical
             collectionMode:         false,
             collectionTileSize:     800,
+            collectionReflection:	false,
+            collectionBorder:		false,
 
             //PERFORMANCE SETTINGS
             imageLoaderLimit:       0,

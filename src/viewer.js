@@ -1324,7 +1324,7 @@ $.extend( $.Viewer.prototype, $.EventSource.prototype, $.ControlDock.prototype, 
                 this.previousButton.disable();
             }
 
-            if( useGroup ){
+            if( useGroup && !this.collectionMode){
                 this.paging = new $.ButtonGroup({
                     buttons: [
                         this.previousButton,
@@ -1905,6 +1905,8 @@ function openTileSource( viewer, source ) {
         _this.viewport = _this.viewport ? _this.viewport : new $.Viewport({
             collectionMode:         true,
             collectionTileSource:   _this.source,
+            collectionBorder:       _this.collectionBorder,
+            collectionReflection:   _this.collectionReflection,
             containerSize:          THIS[ _this.hash ].prevContainerSize,
             contentSize:            _this.source.dimensions,
             springStiffness:        _this.springStiffness,
