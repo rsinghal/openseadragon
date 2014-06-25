@@ -47,7 +47,8 @@ function ImageJob ( options ) {
     
     $.extend( true, this, {
         timeout:        $.DEFAULT_SETTINGS.timeout,
-        jobId:          null
+		jobId:          null,
+	crossOriginPolicy: $.DEFAULT_SETTINGS.crossOriginPolicy
     }, options );
     
     /**
@@ -111,9 +112,10 @@ $.ImageLoader = function() {
     $.extend( true, this, {
         jobLimit:       $.DEFAULT_SETTINGS.imageLoaderLimit,
         jobQueue:       [],
-        jobsInProgress: 0
-    });
+        jobsInProgress: 0,
+	crossOriginPolicy: $.DEFAULT_SETTINGS.crossOriginPolicy
 
+    });
 };
 
 $.ImageLoader.prototype = {
